@@ -102,14 +102,13 @@ jobs:
             ebook_path="$ebook_name.${ext,,}"
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
             arguments="--authors=\"$author\" --publisher=\"$publisher\""
+            arguments+=" --image-size-ratio=0.75"  # Reduce image size to 75% of original
+            arguments+=" --reduce-image-colors"    # Reduce the number of colors in images
+            arguments+=" --linearize-tables"       # Linearize tables to reduce complexity
             cover="covers/${ebook_name}.png"
             if [ -f "$cover" ]; then arguments+=" --cover=\"$cover\""; fi
             style="styles/${ebook_name}.css"
-            if [ -f "$style" ]; then arguments+=" --extra-css=\"$style\""; fi
-
-            find "$(dirname "$recipe_path")" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) \
-              -exec mogrify -resize 800x800\> -quality 75 {} \;
-            
+            if [ -f "$style" ]; then arguments+=" --extra-css=\"$style\""; fi          
             echo $arguments | xargs ebook-convert "$recipe_path" "$ebook_path"
             title=$(ebook-meta "${ebook_path}" | grep '^Title *:' |
               sed 's/^Title *: *\(.*\)/\1/')
