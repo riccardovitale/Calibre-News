@@ -17,16 +17,15 @@ jobs:
     environment: calibre-news
     env:
       output: converted_ebooks
-      publisher: bookfere.com
       author: Calibre News Delivery
-      relay: ${{ secrets.SMTP || 'smtp.gmx.com' }}
-      port: ${{ secrets.PORT || 465 }}
+      relay: ${{ secrets.SMTP || }}
+      port: ${{ secrets.PORT || }}
       encrypt: ${{ secrets.ENCRYPT }}
       secret: ${{ secrets.SECRET }}
       from: ${{ secrets.FROM }}
       to: ${{ secrets.TO }}
       ext: ${{ secrets.FORMAT || 'epub' }}
-      size: ${{ secrets.SIZE || 25 }}
+      size: ${{ secrets.SIZE || 35 }}
     steps:
       - name: Checking Variable
         run: |
@@ -102,7 +101,7 @@ jobs:
             ebook_name="${recipe_path%.*}"
             ebook_path="$ebook_name.${ext,,}"
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
-            arguments="--authors=\"$author\" --publisher=\"$publisher\""
+            arguments="--authors=\"$author\""
             cover="covers/${ebook_name}.png"
             if [ -f "$cover" ]; then arguments+=" --cover=\"$cover\""; fi
             style="styles/${ebook_name}.css"
