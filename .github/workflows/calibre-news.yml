@@ -18,8 +18,8 @@ jobs:
     env:
       output: converted_ebooks
       author: Calibre News Delivery
-      relay: ${{ secrets.SMTP || }}
-      port: ${{ secrets.PORT || }}
+      relay: ${{ secrets.SMTP }}
+      port: ${{ secrets.PORT }}
       encrypt: ${{ secrets.ENCRYPT }}
       secret: ${{ secrets.SECRET }}
       from: ${{ secrets.FROM }}
