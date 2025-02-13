@@ -100,19 +100,7 @@ jobs:
           convert_ebook() {
             ebook_name="${recipe_path%.*}"
             ebook_path="$ebook_name.${ext,,}"
-
-            echo "Extracting images for \"$recipe_path\"..."
-            temp_dir=$(mktemp -d)
-            unzip "$recipe_path" -d "$temp_dir" > /dev/null 2>&1
-      
-            # Resize all images (JPG, PNG) to reduce file size
-            find "$temp_dir" -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) -exec mogrify -resize 800x800\> {} \;
-      
-            # Repackage the recipe after resizing images
-            cd "$temp_dir" || exit
-            zip -r9 "$recipe_path" . > /dev/null 2>&1
-            cd - > /dev/null 2>&1
-            rm -rf "$temp_dir"
+            find . -type f \( -iname "*.jpg" -o -iname "*.jpeg" -o -iname "*.png" \) -exec mogrify -resize 800x800\> {} \;
             
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
             arguments="--authors=\"$author\" --publisher=\"$publisher\""
