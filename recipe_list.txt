@@ -1,19 +1,14 @@
-Wired Magazine, Monthly Edition
+#Wired Magazine, Monthly Edition
 Wired Daily Edition
 USA Today
-CNN
-TIME Magazine
-La Stampa
+#TIME Magazine
 Il Sole 24 Ore
-La Repubblica
-Politico.eu
-Politico
-NY Times Cooking
+#Politico.eu
 The New York Times
-Nature News
-Nature
-National Geographic Traveller
-National Geographic Magazine
-National Geographic History
-National Geographic
-Reuters
+#Nature
+#National Geographic Traveller
+#National Geographic Magazine
+#National Geographic History
+#National Geographic
+#Healthline
+#VOX
