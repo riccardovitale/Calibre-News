@@ -102,9 +102,9 @@ jobs:
             ebook_path="$ebook_name.${ext,,}"
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
             arguments="--authors=\"$author\" --publisher=\"$publisher\""
-            arguments+=" --image-size-ratio=0.75"  # Reduce image size to 75% of original
-            arguments+=" --reduce-image-colors"    # Reduce the number of colors in images
-            arguments+=" --linearize-tables"       # Linearize tables to reduce complexity
+            arguments+=" --epub-max-image-size=400x600"  # Reduce image size to 75% of original
+            arguments+=" --colors=0"    # Reduce the number of colors in images
+            arguments+=" --output-format='.jpeg'"       # Linearize tables to reduce complexity
             cover="covers/${ebook_name}.png"
             if [ -f "$cover" ]; then arguments+=" --cover=\"$cover\""; fi
             style="styles/${ebook_name}.css"
