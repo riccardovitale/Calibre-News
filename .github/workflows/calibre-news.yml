@@ -19,8 +19,8 @@ jobs:
       output: converted_ebooks
       publisher: bookfere.com
       author: Calibre News Delivery
-      relay: ${{ secrets.SMTP }}
-      port: ${{ secrets.PORT }}
+      relay: ${{ secrets.SMTP || 'smtp.gmx.com' }}
+      port: ${{ secrets.PORT || 465 }}
       encrypt: ${{ secrets.ENCRYPT }}
       secret: ${{ secrets.SECRET }}
       from: ${{ secrets.FROM }}
