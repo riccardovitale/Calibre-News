@@ -105,7 +105,12 @@ jobs:
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
             
             # Default conversion arguments
-            arguments="--authors=\"$author\" --no-inline-toc --disable-font-rescaling"
+            arguments="--authors=\"$author\" --publisher=\"$publisher\""
+
+            cover="covers/${ebook_name}.png"
+            if [ -f "$cover" ]; then arguments+=" --cover=\"$cover\""; fi
+            style="styles/${ebook_name}.css"
+            if [ -f "$style" ]; then arguments+=" --extra-css=\"$style\""; fi
             
             # Convert the ebook first
             echo $arguments | xargs ebook-convert "$recipe_path" "$ebook_path"
@@ -134,6 +139,22 @@ jobs:
             else
               echo "File $ebook_path is within size limits ($file_size MB). No compression needed."
             fi
+            # Rename output file
+            title=$(ebook-meta "${ebook_path}" | grep '^Title *:' | sed 's/^Title *: *\(.*\)/\1/')
+            new_ebook_path="${output}/${title}.${ext,,}"
+
+            echo "Renaming \"$ebook_path\" > \"$new_ebook_path\""
+            mv "$ebook_path" "$new_ebook_path"
+          }
+          while read recipe_path || [ -n "$recipe_path" ]; do
+            convert_ebook &
+          done < temp_recipe_list.txt
+          wait
+          count=$(find "$output" -type f -name "*.${ext,,}" | wc -l)
+          echo "Ebook count: $count"
+          if [ $count -eq 0 ]; then
+            echo 'No ebook needs send'; exit 1
+          fi
       - name: Sending Ebook
         if: ${{ success() }}
         run: |
