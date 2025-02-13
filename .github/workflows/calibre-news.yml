@@ -136,7 +136,7 @@ jobs:
             fi
             echo "Sending: \"$filename\""
             calibre-smtp -a "$ebook_path" -r "$relay" --port="$port" \
-              -e "${encrypt^^}" -u "$from" -p "$secret" -s "$title" \
+              -e "${encrypt^^}" -u "$from" -p "$secret" -s "$title" --dont-verify-server-certificate \
               "$from" "$to" "Deliver \"${title}\""
           done < <(find "$output" -type f -name "*.${ext,,}" -print0)
           echo "All jobs done"
