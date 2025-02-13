@@ -25,7 +25,7 @@ jobs:
       from: ${{ secrets.FROM }}
       to: ${{ secrets.TO }}
       ext: ${{ secrets.FORMAT || 'epub' }}
-      size: ${{ secrets.SIZE || 60 }}
+      size: ${{ secrets.SIZE || 25 }}
     steps:
       - name: Checking Variable
         run: |
@@ -98,30 +98,42 @@ jobs:
         run: |
           mkdir $output
           convert_ebook() {
+            recipe_path="$1"
             ebook_name="${recipe_path%.*}"
             ebook_path="$ebook_name.${ext,,}"
+          
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
-            arguments="--authors=\"$author\""
-            cover="covers/${ebook_name}.png"
-            if [ -f "$cover" ]; then arguments+=" --cover=\"$cover\""; fi
-            style="styles/${ebook_name}.css"
-            if [ -f "$style" ]; then arguments+=" --extra-css=\"$style\""; fi
+            
+            # Default conversion arguments
+            arguments="--authors=\"$author\" --no-inline-toc --disable-font-rescaling"
+            
+            # Convert the ebook first
             echo $arguments | xargs ebook-convert "$recipe_path" "$ebook_path"
-            title=$(ebook-meta "${ebook_path}" | grep '^Title *:' |
-              sed 's/^Title *: *\(.*\)/\1/')
-            new_ebook_path="${output}/${title}.${ext,,}"
-            echo "Renaming \"$ebook_path\" > \"$new_ebook_path\""
-            mv "$ebook_path" "$new_ebook_path"
-          }
-          while read recipe_path || [ -n "$recipe_path" ]; do
-            convert_ebook &
-          done < temp_recipe_list.txt
-          wait
-          count=$(find "$output" -type f -name "*.${ext,,}" | wc -l)
-          echo "Ebook count: $count"
-          if [ $count -eq 0 ]; then
-            echo 'No ebook needs send'; exit 1
-          fi
+          
+            # Get file size in MB
+            file_size=$(du -m "$ebook_path" | cut -f 1)
+            size_limit="${SIZE:-25}" # Use the secret or default to 25MB
+          
+            # If file exceeds size limit, compress images and reprocess
+            if [ "$file_size" -ge "$size_limit" ]; then
+              echo "File $ebook_path exceeds size limit ($file_size MB > $size_limit MB), compressing images..."
+          
+              # Optimize images in the ebook
+              temp_dir=$(mktemp -d)
+              unzip "$ebook_path" -d "$temp_dir" > /dev/null 2>&1
+          
+              find "$temp_dir" -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) -exec mogrify -quality 75 -resize 600x800 {} \;
+          
+              # Repackage the ebook
+              cd "$temp_dir" || exit
+              zip -r9 "$ebook_path" . > /dev/null 2>&1
+              cd - > /dev/null 2>&1
+          
+              echo "Recompressed $ebook_path after image optimization."
+              rm -rf "$temp_dir"
+            else
+              echo "File $ebook_path is within size limits ($file_size MB). No compression needed."
+            fi
       - name: Sending Ebook
         if: ${{ success() }}
         run: |
@@ -148,4 +160,4 @@ jobs:
         with:
           name: Calibre-News-Delivery
           path: ${{ env.output }}
-          retention-days: ${{ secrets.DAYS || 90 }}
+          retention-days: ${{ secrets.DAYS || 10 }}
