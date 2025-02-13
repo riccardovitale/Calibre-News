@@ -103,7 +103,7 @@ jobs:
             echo "Converting \"$recipe_path\" > \"$ebook_path\"..."
             arguments="--authors=\"$author\" --publisher=\"$publisher\""
             arguments+=" --epub-max-image-size=400x600"  
-            arguments+=" --output-format='.jpeg'"       
+            arguments+=" --no-svg-cover"       
             cover="covers/${ebook_name}.png"
             if [ -f "$cover" ]; then arguments+=" --cover=\"$cover\""; fi
             style="styles/${ebook_name}.css"
